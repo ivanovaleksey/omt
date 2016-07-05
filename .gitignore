@@ -1,2 +1,5 @@
 .env
 *.xlsx
+.DS_Store
+dist/
+dist.zip
