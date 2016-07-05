@@ -1,13 +1,10 @@
 #! /usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
-require 'active_support'
-require 'active_support/core_ext'
 require 'awesome_print'
 require 'axlsx'
 require 'base64'
 require 'dotenv'
-require 'net/http'
 require 'faraday'
 require 'json'
 require 'yaml'
@@ -144,9 +141,20 @@ end
 
 def dates
   {
-    from: (config['dates']['from']&.to_time || Time.now.beginning_of_week).to_s(:iso8601),
-    to:   (config['dates']['to']&.to_time || Time.now.end_of_week).to_s(:iso8601)
+    from: (time_parse(config['dates']['from']) || beginning_of_month).utc.strftime('%FT%T%:z'),
+    to:   (time_parse(config['dates']['to']) || Time.now).utc.strftime('%FT%T%:z')
   }
+end
+
+def time_parse(date)
+  Time.parse date
+rescue
+  nil
+end
+
+def beginning_of_month
+  now = Time.now
+  Time.new(now.year, now.month, 1)
 end
 
 def config
@@ -190,7 +198,7 @@ end
 
 def deal_label(deal)
   return unless deal
-  [deal['date_start'].to_date, deal['type'], deal['id_deal']].join ' '
+  [Date.parse(deal['date_start']).strftime('%d.%m.%Y'), deal['type'], deal['id_deal']].join ' '
 end
 
 def define_styles(sheet)
