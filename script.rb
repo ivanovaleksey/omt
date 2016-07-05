@@ -141,8 +141,8 @@ end
 
 def dates
   {
-    from: (ENV['DATE_FROM']&.to_time || Time.now.beginning_of_week).to_s(:iso8601),
-    to:   (ENV['DATE_TO']&.to_time || Time.now.end_of_week).to_s(:iso8601)
+    from: (config['dates']['from']&.to_time || Time.now.beginning_of_week).to_s(:iso8601),
+    to:   (config['dates']['to']&.to_time || Time.now.end_of_week).to_s(:iso8601)
   }
 end
 
