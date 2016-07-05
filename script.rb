@@ -6,6 +6,7 @@ require 'axlsx'
 require 'base64'
 require 'dotenv'
 require 'faraday'
+require 'logger'
 require 'json'
 require 'yaml'
 
@@ -235,6 +236,18 @@ def call
   write_file
 end
 
-call
-puts 'File has been successfully created. Press any key to exit.'
-gets
+logger = Logger.new 'log'
+logger.level = Logger::ERROR
+begin
+  logger.debug 'start'
+  call
+  logger.debug 'success'
+  puts 'File has been successfully created. Press any key to exit.'
+rescue Exception => e
+  puts 'Process has been failed. See log file for more information.'
+  logger.error e.message
+  logger.error e.backtrace.join("\n")
+ensure
+  logger.debug 'finish'
+  gets
+end
