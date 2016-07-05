@@ -12,6 +12,8 @@ require 'faraday'
 require 'json'
 require 'yaml'
 
+exit(0) if defined? Ocra
+
 Dotenv.load
 
 class API
@@ -226,3 +228,5 @@ def call
 end
 
 call
+puts 'File has been successfully created. Press any key to exit.'
+gets
