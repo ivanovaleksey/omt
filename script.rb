@@ -1,15 +1,16 @@
 #! /usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
-require 'active_support'
-require 'active_support/core_ext'
 require 'awesome_print'
 require 'axlsx'
 require 'base64'
 require 'dotenv'
 require 'faraday'
+require 'logger'
 require 'json'
 require 'yaml'
+
+exit(0) if defined? Ocra
 
 Dotenv.load
 
@@ -141,9 +142,20 @@ end
 
 def dates
   {
-    from: (ENV['DATE_FROM']&.to_time || Time.now.beginning_of_week).to_s(:iso8601),
-    to:   (ENV['DATE_TO']&.to_time || Time.now.end_of_week).to_s(:iso8601)
+    from: (time_parse(config['dates']['from']) || beginning_of_month).utc.strftime('%FT%T%:z'),
+    to:   (time_parse(config['dates']['to']) || Time.now).utc.strftime('%FT%T%:z')
   }
+end
+
+def time_parse(date)
+  Time.parse date
+rescue
+  nil
+end
+
+def beginning_of_month
+  now = Time.now
+  Time.new(now.year, now.month, 1)
 end
 
 def config
@@ -182,18 +194,17 @@ end
 
 def format_date(date)
   return unless date
-  Date.parse(date).strftime('%d/%m/%Y')
+  Date.parse(date)
 end
 
 def deal_label(deal)
   return unless deal
-  [deal['date_start'].to_date, deal['type'], deal['id_deal']].join ' '
+  [Date.parse(deal['date_start']).strftime('%d.%m.%Y'), deal['type'], deal['id_deal']].join ' '
 end
 
 def define_styles(sheet)
   header = sheet.styles.add_style bg_color: '5B9BD5', fg_color: 'FFFFFF', sz: 10, b: true
-  row = sheet.styles.add_style border: { style: :thin, color: '5B9BD5', edges: [:top] }
-  @styles = { header: header, row: row }
+  @styles = { header: header }
 end
 
 def filename
@@ -212,7 +223,7 @@ def write_file
 
       documents.each do |document|
         document_rows(document).each do |row|
-          sheet.add_row row, style: @styles[:row]
+          sheet.add_row row
         end
       end
     end
@@ -224,4 +235,18 @@ def call
   write_file
 end
 
-call
+logger = Logger.new 'log'
+logger.level = Logger::ERROR
+begin
+  logger.debug 'start'
+  call
+  logger.debug 'success'
+  puts 'File has been successfully created. Press any key to exit.'
+rescue Exception => e
+  puts 'Process has been failed. See log file for more information.'
+  logger.error e.message
+  logger.error e.backtrace.join("\n")
+ensure
+  logger.debug 'finish'
+  gets
+end

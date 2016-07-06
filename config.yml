@@ -15,3 +15,7 @@ headers:
   - Кол-во
   - Цена
   - Итого
+
+dates:
+  from:
+  to:
