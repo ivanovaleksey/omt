@@ -194,7 +194,7 @@ end
 
 def format_date(date)
   return unless date
-  Date.parse(date).strftime('%d/%m/%Y')
+  Date.parse(date)
 end
 
 def deal_label(deal)
@@ -204,8 +204,7 @@ end
 
 def define_styles(sheet)
   header = sheet.styles.add_style bg_color: '5B9BD5', fg_color: 'FFFFFF', sz: 10, b: true
-  row = sheet.styles.add_style border: { style: :thin, color: '5B9BD5', edges: [:top] }
-  @styles = { header: header, row: row }
+  @styles = { header: header }
 end
 
 def filename
@@ -224,7 +223,7 @@ def write_file
 
       documents.each do |document|
         document_rows(document).each do |row|
-          sheet.add_row row, style: @styles[:row]
+          sheet.add_row row
         end
       end
     end
