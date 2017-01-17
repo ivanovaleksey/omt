@@ -243,19 +243,19 @@ logo = <<-STR
  \\___/|_|  |_| |_|    \\____\\___/|_| |_|___/\\__,_|_|\\__| v#{File.read('.version').strip}
 STR
 
-logger = Logger.new 'log'
-logger.level = Logger::ERROR
+$logger = Logger.new 'log'
+$logger.level = Logger::ERROR
 begin
-  logger.debug 'start'
+  $logger.debug 'start'
   puts logo
   call
-  logger.debug 'success'
+  $logger.debug 'success'
   puts 'File has been successfully created. Press any key to exit.'
 rescue Exception => e
   puts 'Process has been failed. See log file for more information.'
-  logger.error e.message
-  logger.error e.backtrace.join("\n")
+  $logger.error e.message
+  $logger.error e.backtrace.join("\n")
 ensure
-  logger.debug 'finish'
+  $logger.debug 'finish'
   gets
 end
