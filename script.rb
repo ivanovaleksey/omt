@@ -235,10 +235,19 @@ def call
   write_file
 end
 
+logo = <<-STR
+  ___  __  __ _____    ____                      _ _
+ / _ \\|  \\/  |_   _|  / ___|___  _ __  ___ _   _| | |_
+| | | | |\\/| | | |   | |   / _ \\| '_ \\/ __| | | | | __|
+| |_| | |  | | | |   | |__| (_) | | | \\__ \\ |_| | | |_
+ \\___/|_|  |_| |_|    \\____\\___/|_| |_|___/\\__,_|_|\\__| v#{File.read('.version').strip}
+STR
+
 logger = Logger.new 'log'
 logger.level = Logger::ERROR
 begin
   logger.debug 'start'
+  puts logo
   call
   logger.debug 'success'
   puts 'File has been successfully created. Press any key to exit.'
