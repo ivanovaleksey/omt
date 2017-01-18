@@ -14,6 +14,12 @@ exit(0) if defined? Ocra
 
 Dotenv.load
 
+module Omt
+  module VERSION
+    STRING = '0.3'
+  end
+end
+
 class API
   class << self
     def get(url, params = {})
@@ -240,7 +246,7 @@ logo = <<-STR
  / _ \\|  \\/  |_   _|  / ___|___  _ __  ___ _   _| | |_
 | | | | |\\/| | | |   | |   / _ \\| '_ \\/ __| | | | | __|
 | |_| | |  | | | |   | |__| (_) | | | \\__ \\ |_| | | |_
- \\___/|_|  |_| |_|    \\____\\___/|_| |_|___/\\__,_|_|\\__| v#{File.read('.version').strip}
+ \\___/|_|  |_| |_|    \\____\\___/|_| |_|___/\\__,_|_|\\__| v#{Omt::VERSION::STRING}
 STR
 
 $logger = Logger.new 'log'
