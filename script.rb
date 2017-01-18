@@ -181,8 +181,8 @@ def document_rows(document)
       document['state'],
       document['summa'],
       document['paid'],
-      format_date(document['ADD_LIST_DOCUMENTS_N33']),
-      format_date(document['ADD_LIST_DOCUMENTS_N34']),
+      format_custom_date(document['ADD_LIST_DOCUMENTS_N33']),
+      format_custom_date(document['ADD_LIST_DOCUMENTS_N34']),
       document['customer']['name'],
       document['manager']['name'],
       deal_label(document['deal']),
@@ -201,6 +201,16 @@ end
 def format_date(date)
   return unless date
   Date.parse(date)
+end
+
+def format_custom_date(date)
+  return unless date
+  match = /^(?<month>[а-я]{3})\s+(?<day>\d{1,2})\s+(?<year>\d{4})/.match date
+  Date.parse([
+    match['month'],
+    match['day'].rjust(2, '0'),
+    match['year']
+  ].join(' '))
 end
 
 def deal_label(deal)
@@ -251,11 +261,12 @@ STR
 
 $logger = Logger.new 'log'
 $logger.level = Logger::ERROR
+
 begin
-  $logger.debug 'start'
+  $logger.debug 'Start'
   puts logo
   call
-  $logger.debug 'success'
+  $logger.debug 'Done'
   puts 'File has been successfully created. Press any key to exit.'
 rescue Exception => e
   puts 'Process has been failed. See log file for more information.'
