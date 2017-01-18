@@ -14,6 +14,12 @@ exit(0) if defined? Ocra
 
 Dotenv.load
 
+module Omt
+  module VERSION
+    STRING = '0.3'
+  end
+end
+
 class API
   class << self
     def get(url, params = {})
@@ -175,8 +181,8 @@ def document_rows(document)
       document['state'],
       document['summa'],
       document['paid'],
-      format_date(document['ADD_LIST_DOCUMENTS_N33']),
-      format_date(document['ADD_LIST_DOCUMENTS_N34']),
+      format_custom_date(document['ADD_LIST_DOCUMENTS_N33']),
+      format_custom_date(document['ADD_LIST_DOCUMENTS_N34']),
       document['customer']['name'],
       document['manager']['name'],
       deal_label(document['deal']),
@@ -195,6 +201,16 @@ end
 def format_date(date)
   return unless date
   Date.parse(date)
+end
+
+def format_custom_date(date)
+  return unless date
+  match = /^(?<month>[а-я]{3})\s+(?<day>\d{1,2})\s+(?<year>\d{4})/.match date
+  Date.parse([
+    match['month'],
+    match['day'].rjust(2, '0'),
+    match['year']
+  ].join(' '))
 end
 
 def deal_label(deal)
@@ -235,18 +251,28 @@ def call
   write_file
 end
 
-logger = Logger.new 'log'
-logger.level = Logger::ERROR
+logo = <<-STR
+  ___  __  __ _____    ____                      _ _
+ / _ \\|  \\/  |_   _|  / ___|___  _ __  ___ _   _| | |_
+| | | | |\\/| | | |   | |   / _ \\| '_ \\/ __| | | | | __|
+| |_| | |  | | | |   | |__| (_) | | | \\__ \\ |_| | | |_
+ \\___/|_|  |_| |_|    \\____\\___/|_| |_|___/\\__,_|_|\\__| v#{Omt::VERSION::STRING}
+STR
+
+$logger = Logger.new 'log'
+$logger.level = Logger::ERROR
+
 begin
-  logger.debug 'start'
+  $logger.debug 'Start'
+  puts logo
   call
-  logger.debug 'success'
+  $logger.debug 'Done'
   puts 'File has been successfully created. Press any key to exit.'
 rescue Exception => e
   puts 'Process has been failed. See log file for more information.'
-  logger.error e.message
-  logger.error e.backtrace.join("\n")
+  $logger.error e.message
+  $logger.error e.backtrace.join("\n")
 ensure
-  logger.debug 'finish'
+  $logger.debug 'finish'
   gets
 end
