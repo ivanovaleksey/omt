@@ -205,7 +205,7 @@ end
 
 def format_custom_date(date)
   return unless date
-  match = /^(?<month>[а-я]{3})\s+(?<day>\d{1,2})\s+(?<year>\d{4})/.match date
+  match = /^(?<month>[a-zA-Zа-я]{3})\s+(?<day>\d{1,2})\s+(?<year>\d{4})/.match date
   Date.parse([
     match['month'],
     match['day'].rjust(2, '0'),
