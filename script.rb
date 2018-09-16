@@ -15,6 +15,22 @@ exit(0) if defined? Ocra
 Dotenv.load
 
 module Omt
+  MONTHNAMES = [
+    nil,
+    'янв',
+    'фев',
+    'мар',
+    'апр',
+    'май',
+    'июн',
+    'июл',
+    'авг',
+    'сен',
+    'окт',
+    'ноя',
+    'дек',
+  ].freeze
+
   module VERSION
     STRING = '0.3'
   end
@@ -140,9 +156,10 @@ def document_params
 end
 
 def date_filter
+  d = dates
   [
-    "data_doc ge datetime'#{dates[:from]}'",
-    "data_doc le datetime'#{dates[:to]}'"
+    "data_doc ge datetime'#{d[:from]}'",
+    "data_doc le datetime'#{d[:to]}'"
   ].join(' and ')
 end
 
@@ -154,6 +171,7 @@ def dates
 end
 
 def time_parse(date)
+  return unless date
   Time.parse date
 rescue
   nil
@@ -206,11 +224,21 @@ end
 def format_custom_date(date)
   return unless date
   match = /^(?<month>[а-я]{3})\s+(?<day>\d{1,2})\s+(?<year>\d{4})/.match date
-  Date.parse([
-    match['month'],
+  date_str = [
+    english_month(match['month']),
     match['day'].rjust(2, '0'),
     match['year']
-  ].join(' '))
+  ].join(' ')
+
+  Date.parse(date_str)
+rescue
+  p 'Failed to parse date', date, date_str
+  raise
+end
+
+def english_month(russian_month)
+  idx = Omt::MONTHNAMES.index(russian_month)
+  Date::MONTHNAMES[idx]
 end
 
 def deal_label(deal)
