@@ -32,7 +32,7 @@ module Omt
   ].freeze
 
   module VERSION
-    STRING = '0.3'
+    STRING = '0.4'
   end
 end
 
